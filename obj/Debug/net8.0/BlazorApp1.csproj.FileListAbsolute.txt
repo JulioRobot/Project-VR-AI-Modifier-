@@ -128,6 +128,7 @@ D:\Julio\BELAJAR\Blazor\New folder\LoginRegisterAuth\BlazorApp1\BlazorApp1\obj\D
 D:\Julio\BELAJAR\Blazor\New folder\LoginRegisterAuth\BlazorApp1\BlazorApp1\obj\Debug\net8.0\BlazorApp1.csproj.CoreCompileInputs.cache
 D:\Julio\BELAJAR\Blazor\New folder\LoginRegisterAuth\BlazorApp1\BlazorApp1\obj\Debug\net8.0\BlazorApp1.MvcApplicationPartsAssemblyInfo.cs
 D:\Julio\BELAJAR\Blazor\New folder\LoginRegisterAuth\BlazorApp1\BlazorApp1\obj\Debug\net8.0\BlazorApp1.MvcApplicationPartsAssemblyInfo.cache
+D:\Julio\BELAJAR\Blazor\New folder\LoginRegisterAuth\BlazorApp1\BlazorApp1\obj\Debug\net8.0\BlazorApp1.sourcelink.json
 D:\Julio\BELAJAR\Blazor\New folder\LoginRegisterAuth\BlazorApp1\BlazorApp1\obj\Debug\net8.0\staticwebassets.build.json
 D:\Julio\BELAJAR\Blazor\New folder\LoginRegisterAuth\BlazorApp1\BlazorApp1\obj\Debug\net8.0\staticwebassets.development.json
 D:\Julio\BELAJAR\Blazor\New folder\LoginRegisterAuth\BlazorApp1\BlazorApp1\obj\Debug\net8.0\staticwebassets\msbuild.BlazorApp1.Microsoft.AspNetCore.StaticWebAssets.props
