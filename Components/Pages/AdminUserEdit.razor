@@ -1,0 +1,28 @@
+﻿@page "/usersmanagement/{idUser:guid}"
+
+@inject NavigationManager NavigationManager
+@inject IUserService UserService
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Identity
+
+<h3>Admin User Edit</h3>
+@if (userData != null)
+{
+	<h3>@userData.Email</h3>	
+}
+
+
+@code {
+	[Parameter]
+	public Guid? idUser { get; set; }
+	private string? idUserString;
+	private ApplicationUser? userData;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		idUserString = idUser.ToString();
+
+		if (idUserString != null) userData = await UserService.GetUserByIdAsync(idUserString);
+	}
+
+}

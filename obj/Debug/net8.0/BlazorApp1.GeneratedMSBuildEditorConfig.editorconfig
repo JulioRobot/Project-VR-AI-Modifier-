@@ -174,6 +174,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Julio/BELAJAR/Blazor/New folder/LoginRegisterAuth/BlazorApp1/BlazorApp1/Components/Pages/AdminUserEdit.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblVzZXJFZGl0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Julio/BELAJAR/Blazor/New folder/LoginRegisterAuth/BlazorApp1/BlazorApp1/Components/Pages/AdminUsersManagment.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBZG1pblVzZXJzTWFuYWdtZW50LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 

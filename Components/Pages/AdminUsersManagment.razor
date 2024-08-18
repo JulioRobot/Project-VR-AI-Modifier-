@@ -20,6 +20,7 @@ else
 				<th>UserName</th>
 				<th>Email</th>
 				<th>Email Confirmed</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -30,6 +31,9 @@ else
 					<td>@user.UserName</td>
 					<td>@user.Email</td>
 					<td>@user.EmailConfirmed</td>
+					<td>
+						<a href="@string.Format("/usersmanagement/{0}",user.Id)" class="btn btn-primary">Edit</a>
+					</td>
 				</tr>
 			}
 		</tbody>
