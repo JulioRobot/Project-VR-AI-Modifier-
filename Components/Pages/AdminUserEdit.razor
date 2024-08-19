@@ -2,8 +2,11 @@
 
 @inject NavigationManager NavigationManager
 @inject IUserService UserService
+@inject IJsInteropService JsInterop
+
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
 
 <h3>Admin User Edit</h3>
 @if (userData != null)
@@ -13,9 +16,13 @@
 
 
 @code {
+	//AdminChange123@
 	[Parameter]
 	public Guid? idUser { get; set; }
-	private string? idUserString;
+	private UsernamePassChangeModel changeModel { get; set; } = new();
+
+
+	private string? idUserString;	
 	private ApplicationUser? userData;
 
 	protected override async Task OnParametersSetAsync()
@@ -25,4 +32,58 @@
 		if (idUserString != null) userData = await UserService.GetUserByIdAsync(idUserString);
 	}
 
+	private async Task ChangeUsernamePass()
+	{
+		var result = await UserService.ChangeUsernameAsync(userData.Id, changeModel.NewUsername);
+		if (result.Succeeded)
+		{
+			await JsInterop.LogToConsole("Username changed Successfully");
+		}
+		else
+		{
+			foreach (var error in result.Errors)
+			{
+				await JsInterop.LogToConsole($"Error: {error.Description}", "error");
+			}			
+		}
+
+		var token = await UserService.GeneratePasswordResetTokenAsync(userData.Id);
+
+		if (token == null)
+		{
+			await JsInterop.LogToConsole($"Error: token is null", "error");
+		}
+		else
+		{
+			var resultPassword = await UserService.ResetPasswordWithTokenAsync(userData.Id, token, changeModel.NewPassword);
+			if (resultPassword.Succeeded)
+			{
+				await JsInterop.LogToConsole("Password changed Successfully");
+			}
+			else
+			{
+				foreach (var error in resultPassword.Errors)
+				{
+					await JsInterop.LogToConsole($"Error: {error.Description}", "error");
+				}
+			}
+		}
+
+		
+	}
+
+	private class UsernamePassChangeModel
+	{
+		[Required]
+		[StringLength(256, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+		public string NewUsername { get; set; }
+
+		[Required]
+		[StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+		public string NewPassword { get; set; }
+
+	
+	}
+
 }
+
