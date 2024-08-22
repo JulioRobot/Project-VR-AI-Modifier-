@@ -1,6 +1,7 @@
 using BlazorApp1.Components;
 using BlazorApp1.Components.Account;
 using BlazorApp1.Data;
+using BlazorApp1.Data.SpesificCustom;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
@@ -36,14 +37,35 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddTokenProvider<CustomResetPasswordTokenProvider<ApplicationUser>>("CustomResetPassword");
 
+
+builder.Services.Configure<IdentityOptions>(option =>
+{
+    option.Tokens.PasswordResetTokenProvider = "CustomResetPassword";
+});
+
+builder.Services.Configure<OptionCustomResetPasswordTokenProvider>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromHours(1);
+});
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
+builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJsInteropService, JsInteropService>();
 
+builder.Services.AddScoped<IEmailServiceManager, EmailServiceManager>(serviceProvider =>
+{
+    var jsInteropService = serviceProvider.GetRequiredService<IJsInteropService>();
+    var clientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+
+    return new EmailServiceManager(jsInteropService, clientFactory);
+});
+
+builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

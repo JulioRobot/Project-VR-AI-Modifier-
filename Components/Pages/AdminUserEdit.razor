@@ -1,75 +1,98 @@
 ﻿@page "/usersmanagement/{idUser:guid}"
 
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.IdentityModel.Tokens
+@using System.Web
 @inject NavigationManager NavigationManager
+@inject IUserManagementService UserManagementService
 @inject IUserService UserService
 @inject IJsInteropService JsInterop
 
 @rendermode InteractiveServer
-@using Microsoft.AspNetCore.Identity
-@using System.ComponentModel.DataAnnotations
+
 
 <h3>Admin User Edit</h3>
+
+<h4>@Message</h4>
 @if (userData != null)
 {
-	<h3>@userData.Email</h3>	
+	<EditForm Model="changeInputModel" method="post" OnValidSubmit="ChangeUsernamePass" FormName="change">
+		<DataAnnotationsValidator></DataAnnotationsValidator>
+		<h2>Create a new support</h2>
+		<hr/>
+		<ValidationSummary class="text-danger" role="alert"></ValidationSummary>
+
+		<div class="form-floating mb-3">
+			<InputText @bind-Value="changeInputModel.NewUsername" class="form-control" placeholder="username"/>
+			<label>Username</label>
+			<ValidationMessage For="() => changeInputModel.NewUsername" class="text-danger"></ValidationMessage>
+		</div>
+
+		<div class="form-floating mb-3">
+			<InputText @bind-Value="changeInputModel.NewPassword" class="form-control"></InputText>
+			<label>Password</label>
+		</div>
+		<button type="submit" class="btn btn-primary">Update</button>
+	</EditForm>
 }
 
 
 @code {
-	//AdminChange123@
+
+
 	[Parameter]
 	public Guid? idUser { get; set; }
-	private UsernamePassChangeModel changeModel { get; set; } = new();
 
+	private string? Message; 
 
 	private string? idUserString;	
 	private ApplicationUser? userData;
+
+	[SupplyParameterFromForm]
+	private UsernamePassChangeModel changeInputModel { get; set; } = new ();
 
 	protected override async Task OnParametersSetAsync()
 	{
 		idUserString = idUser.ToString();
 
-		if (idUserString != null) userData = await UserService.GetUserByIdAsync(idUserString);
+		if (idUserString != null)
+		{
+			Message = "";
+			userData = await UserService.GetUserByIdAsync(idUserString);
+			changeInputModel.NewUsername = userData.UserName;
+		}
+
 	}
 
 	private async Task ChangeUsernamePass()
 	{
-		var result = await UserService.ChangeUsernameAsync(userData.Id, changeModel.NewUsername);
-		if (result.Succeeded)
+		if (userData == null || idUserString == null)
 		{
-			await JsInterop.LogToConsole("Username changed Successfully");
+			await JsInterop.LogToConsole("User data is not available", "error");
+			return;
+		}
+
+		string baseUrl = NavigationManager.BaseUri;
+
+		var returnService = await UserManagementService.AdminChangeUsernameAndPassword(
+				userData.Id,
+				changeInputModel.NewUsername,
+				changeInputModel.NewPassword,
+				userData.Email,
+				baseUrl
+			);
+
+		if (returnService.Success)
+		{
+			await JsInterop.LogToConsole("Username and password updated successfully ,E-mail sended to user");
+			Message = "Username and password updated successfully";
 		}
 		else
 		{
-			foreach (var error in result.Errors)
-			{
-				await JsInterop.LogToConsole($"Error: {error.Description}", "error");
-			}			
+			Message = returnService.Message;	
+			
 		}
-
-		var token = await UserService.GeneratePasswordResetTokenAsync(userData.Id);
-
-		if (token == null)
-		{
-			await JsInterop.LogToConsole($"Error: token is null", "error");
-		}
-		else
-		{
-			var resultPassword = await UserService.ResetPasswordWithTokenAsync(userData.Id, token, changeModel.NewPassword);
-			if (resultPassword.Succeeded)
-			{
-				await JsInterop.LogToConsole("Password changed Successfully");
-			}
-			else
-			{
-				foreach (var error in resultPassword.Errors)
-				{
-					await JsInterop.LogToConsole($"Error: {error.Description}", "error");
-				}
-			}
-		}
-
-		
 	}
 
 	private class UsernamePassChangeModel

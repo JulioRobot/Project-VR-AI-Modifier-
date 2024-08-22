@@ -3,21 +3,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Components.Authorization;
 namespace BlazorApp1.Data
 {
 	public interface IUserService
 	{
 		Task<List<ApplicationUser>> GetAllUserAsync();
 		Task<ApplicationUser> GetUserByIdAsync(string userId);
+		Task<ApplicationUser> GetUserByEmail(string email);
 		Task<IdentityResult> ChangeUsernameAsync(string userId, string newUsername);
 		Task<IdentityResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
 		Task<string> GeneratePasswordResetTokenAsync(string userId);
 		Task<IdentityResult> ResetPasswordWithTokenAsync(string userId, string Token, string newPassword);
+		Task<IdentityResult> SetEmailConfirmedAsync(string userId, bool confirmed);
 	}
 
 	public class UserService : IUserService
-	{
+	{		
 		private readonly UserManager<ApplicationUser> _userManager;
 
 		public UserService(UserManager<ApplicationUser> userManager)
@@ -26,7 +28,7 @@ namespace BlazorApp1.Data
 		}
 
 		public async Task<List<ApplicationUser>> GetAllUserAsync()
-		{
+		{	
 			return await _userManager.Users.ToListAsync();
 		}
 
@@ -37,7 +39,13 @@ namespace BlazorApp1.Data
 			return user ?? throw new ArgumentException($"User with ID {userId} not found.");
 		}
 
-		public async Task<IdentityResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+        public async Task<ApplicationUser> GetUserByEmail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+			return user ?? throw new ArgumentException($"User with E-mail {email} not found.");
+        }
+
+        public async Task<IdentityResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
@@ -54,7 +62,8 @@ namespace BlazorApp1.Data
 		{
 			var token = "";
 			var user = await _userManager.FindByIdAsync(userId);
-			
+		
+
 			if (user != null) token = await _userManager.GeneratePasswordResetTokenAsync(user);
 			return token;
 		}
@@ -93,6 +102,18 @@ namespace BlazorApp1.Data
 
 		}
 
-	
-	}
+		public async Task<IdentityResult> SetEmailConfirmedAsync(string userId, bool confirmed)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null) 
+			{
+				return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+			}
+
+			user.EmailConfirmed = confirmed;
+			return await _userManager.UpdateAsync(user);
+		}
+
+       
+    }
 }
